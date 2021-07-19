@@ -70,34 +70,34 @@ class Man:
         cprint('{} Вьехал в дом'.format(self.name), color='cyan')
 
     def cat_food(self):
+        cprint('{} покормил кота'.format(self.name), color='cyan')
         self.house.bowl += 50
         self.house.money -= 50
 
     def cleaning(self):
+        cprint('{} убрался'.format(self.name), color='cyan')
         self.house.mud -= 100
         self.fullness -= 20
 
     def find_a_cat(self, cat):
         self.cat = cat
+        self.house.bowl += 10
         cprint('{} нашел кота'.format(self.name), color='cyan')
 
     def act(self):
-        if self.cat.fullness <= 0:
-            cprint('{} умер...'.format(self.cat.name), color='red')
-            return
         if self.fullness <= 0:
             cprint('{} умер...'.format(self.name), color='red')
             return
         dice = randint(1, 6)
-        if self.fullness < 20:
+        if self.fullness < 30:
             self.eat()
-        elif self.house.food < 10:
+        elif self.house.food < 20:
             self.shopping()
         elif self.house.money < 50:
             self.work()
-        elif self.house.bowl == 0:
+        elif self.house.bowl <= 10:
             self.cat_food()
-        elif self.house.mud >= 100 :
+        elif self.house.mud >= 100:
             self.cleaning()
         elif dice == 1:
             self.work()
@@ -149,9 +149,13 @@ class Cat:
         self.house.mud += 5
 
     def act(self):
+        if self.house.bowl == 0 or self.fullness == 0:
+            cprint('{} умер...'.format(self.name), color='red')
+            return
+        dice = randint(1, 4)
         if self.fullness < 20:
             self.eat()
-        elif self.fullness >= 50:
+        elif dice // 2 == 0:
             self.sleep()
         else:
             self.tear_wallpaper()
