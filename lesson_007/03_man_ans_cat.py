@@ -69,10 +69,6 @@ class Man:
         self.fullness -= 10
         cprint('{} Вьехал в дом'.format(self.name), color='cyan')
 
-    def shelter_a_cat (self, cat):
-        self.cat = cat
-        cprint('{} Теперь в доме'.format(self.cat), color='cyan')
-
     def cat_food(self):
         self.house.bowl += 50
         self.house.money -= 50
@@ -81,7 +77,14 @@ class Man:
         self.house.mud -= 100
         self.fullness -= 20
 
+    def find_a_cat(self, cat):
+        self.cat = cat
+        cprint('{} нашел кота'.format(self.name), color='cyan')
+
     def act(self):
+        if self.cat.fullness <= 0:
+            cprint('{} умер...'.format(self.cat.name), color='red')
+            return
         if self.fullness <= 0:
             cprint('{} умер...'.format(self.name), color='red')
             return
@@ -92,6 +95,10 @@ class Man:
             self.shopping()
         elif self.house.money < 50:
             self.work()
+        elif self.house.bowl == 0:
+            self.cat_food()
+        elif self.house.mud >= 100 :
+            self.cleaning()
         elif dice == 1:
             self.work()
         elif dice == 2:
@@ -119,21 +126,52 @@ class Cat:
         self.fullness = 50
         self.house = None
 
+    def __str__(self):
+        return 'Я - {}, сытость {}'.format(
+            self.name, self.fullness)
+
+    def go_to_the_house(self, house):
+        self.house = house
+        cprint('{} Вьехал в дом'.format(self.name), color='cyan')
+
+    def eat(self):
+        cprint('{} поел'.format(self.name), color='yellow')
+        self.fullness += 20
+        self.house.bowl -= 10
+
+    def sleep(self):
+        cprint('{} поспал'.format(self.name), color='yellow')
+        self.fullness -= 10
+
+    def tear_wallpaper(self):
+        cprint('{} драл обои'.format(self.name), color='yellow')
+        self.fullness -= 10
+        self.house.mud += 5
+
+    def act(self):
+        if self.fullness < 20:
+            self.eat()
+        elif self.fullness >= 50:
+            self.sleep()
+        else:
+            self.tear_wallpaper()
 
 
-citizens = [
-    Man(name='Бивис'),
-    Man(name='Батхед'),
-    Man(name='Кенни'),
-]
+
+# citizens = [
+#     Man(name='Бивис'),
+#     Man(name='Батхед'),
+#     Man(name='Кенни'),
+# ]
 
 
 my_sweet_home = House()
-my_cat = Cat(name='Гарфилд')
-
+Garfield = Cat(name='Гарфилд')
 Jon = Man(name='Джон')
+
 Jon.go_to_the_house(house=my_sweet_home)
-Jon.shelter_a_cat(cat=my_cat)
+Jon.find_a_cat(cat=Garfield)
+Garfield.go_to_the_house(house=my_sweet_home)
 
 
 # for citisen in citizens:
@@ -141,11 +179,11 @@ Jon.shelter_a_cat(cat=my_cat)
 
 for day in range(1, 366):
     print('================ день {} =================='.format(day))
-    for citisen in citizens:
-        citisen.act()
+    Jon.act()
+    Garfield.act()
     print('--- в конце дня ---')
-    for citisen in citizens:
-        print(citisen)
+    print(Jon)
+    print(Garfield)
     print(my_sweet_home)
 
 
